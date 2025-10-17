@@ -1,0 +1,119 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+.env
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+*.ipynb
+
+# PyTorch / ML Models
+*.pth
+*.pt
+*.bin
+*.safetensors
+*.ckpt
+*.h5
+*.hdf5
+models/
+checkpoints/
+outputs/
+logs/
+runs/
+wandb/
+
+# Hugging Face
+.cache/
+huggingface_hub/
+transformers_cache/
+
+# Data Files
+*.parquet
+*.csv
+*.json
+*.jsonl
+*.txt
+data/
+datasets/
+*.zip
+*.tar.gz
+*.tar.bz2
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+tensorboard/
+lightning_logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# UV specific
+.uv/
+
+# Large files that shouldn't be tracked
+*.bin
+*.safetensors
+*.model
+*.weights
+
+# Google Colab
+/content/
+/mnt/
+/drive/
+
+# Specific to your project
+eval/dolly_15k.ipynb
+eval/*.ipynb
