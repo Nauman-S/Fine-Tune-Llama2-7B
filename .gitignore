@@ -33,7 +33,6 @@ env/
 # Jupyter Notebook
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
-*.ipynb
 
 # PyTorch / ML Models
 *.pth
@@ -113,7 +112,3 @@ temp/
 /content/
 /mnt/
 /drive/
-
-# Specific to your project
-eval/dolly_15k.ipynb
-eval/*.ipynb
