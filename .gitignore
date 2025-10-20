@@ -44,7 +44,6 @@ env/
 *.hdf5
 models/
 checkpoints/
-outputs/
 logs/
 runs/
 wandb/
@@ -58,7 +57,6 @@ transformers_cache/
 *.parquet
 *.csv
 *.json
-*.jsonl
 *.txt
 data/
 datasets/
