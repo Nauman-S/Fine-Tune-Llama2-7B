@@ -48,6 +48,8 @@ logs/
 runs/
 wandb/
 
+FastChat/
+
 # Hugging Face
 .cache/
 huggingface_hub/
