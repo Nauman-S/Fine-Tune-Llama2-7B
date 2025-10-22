@@ -80,7 +80,7 @@ def format_instruction(example):
     
     return {"text": prompt}
 
-def create_fsdp_model(model_name, lora_config, rank):
+def create_no_fsdp_model(model_name, lora_config, rank):
     """Create model with FSDP wrapping"""
     if rank == 0:
         print(f"Loading model: {model_name}")
@@ -92,40 +92,10 @@ def create_fsdp_model(model_name, lora_config, rank):
         trust_remote_code=True
     )
     
-    # Don't apply PEFT here - SFTTrainer will handle it
     model = get_peft_model(model, lora_config)
-    
     model = model.to(dtype=torch.float16)
     
     if rank == 0:
-        print("Model loaded, wrapping with FSDP...")
-    
-    fp16_policy = MixedPrecision(
-        param_dtype=torch.float16,
-        reduce_dtype=torch.float16,
-        buffer_dtype=torch.float16, 
-    )
-    
-    llama_auto_wrap_policy = partial(
-        transformer_auto_wrap_policy,
-        transformer_layer_cls={
-            LlamaDecoderLayer,
-        },
-    )
-
-    model = FSDP(
-        model,
-        auto_wrap_policy=llama_auto_wrap_policy,
-        mixed_precision=fp16_policy,
-        backward_prefetch=BackwardPrefetch.BACKWARD_PRE,
-        forward_prefetch=True,
-        sharding_strategy=ShardingStrategy.FULL_SHARD,
-        device_id=torch.cuda.current_device(),
-        use_orig_params=True,
-    )
-    
-    if rank == 0:
-        print("Model wrapped with FSDP successfully!")
         print(f"Trainable parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
     
     return model
@@ -226,7 +196,7 @@ def run_training(args, rank, world_size):
     )
     
 
-    model = create_fsdp_model(args.model_name, lora_config, rank)
+    model = create_no_fsdp_model(args.model_name, lora_config, rank)
     
     training_args = SFTConfig(
         output_dir=args.output_dir,
@@ -253,13 +223,14 @@ def run_training(args, rank, world_size):
         logging_strategy="steps",
         # FSDP parameters
         ddp_find_unused_parameters=False,
-        # fsdp="full_shard auto_wrap",
-        # fsdp_config={
-        #     "fsdp_auto_wrap_policy": "TRANSFORMER_BASED_WRAP",
-        #     "fsdp_backward_prefetch": "BACKWARD_PRE",
-        #     "fsdp_forward_prefetch": True,
-        #     "fsdp_offload_params": True,
-        # },
+        fsdp="full_shard auto_wrap",
+        fsdp_config={
+            "fsdp_auto_wrap_policy": "TRANSFORMER_BASED_WRAP",
+            "fsdp_transformer_layer_cls_to_wrap": ["LlamaDecoderLayer"],
+            "fsdp_backward_prefetch": "BACKWARD_PRE",
+            "fsdp_forward_prefetch": True,
+            "fsdp_use_orig_params": True,
+        },
     )
     
     trainer = SFTTrainer(

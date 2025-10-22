@@ -12,7 +12,7 @@
 
 # Set environment variables for distributed training
 export NCCL_DEBUG=INFO
-export TORCH_NCCL_TRACE_BUFFER_SIZE=1048576
+export TORCH_FR_BUFFER_SIZE=1048576
 export PYTHONUNBUFFERED=1
 export CUDA_VISIBLE_DEVICES=0,1
 
