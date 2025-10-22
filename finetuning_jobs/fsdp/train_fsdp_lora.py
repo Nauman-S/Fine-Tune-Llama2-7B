@@ -26,7 +26,22 @@ import json
 import platform
 import psutil
 from datetime import datetime
-from torch.distributed.fsdp import BackwardPrefetch
+from transformers import TrainerCallback
+
+class GPUMemoryCallback(TrainerCallback):
+    """Callback to log GPU memory usage during training"""
+    
+    def __init__(self, rank, logging_steps=10):
+        self.rank = rank
+        self.logging_steps = logging_steps
+    
+    def on_step_end(self, args, state, control, **kwargs):
+        if state.global_step % self.logging_steps == 0:
+            allocated = torch.cuda.memory_allocated(self.rank) / 1024**3
+            reserved = torch.cuda.memory_reserved(self.rank) / 1024**3
+            
+            print(f"[Rank {self.rank}] Step {state.global_step}: "
+                  f"Allocated={allocated:.2f}GB, Reserved={reserved:.2f}GB")
 
 def setup_distributed():
     """Initialize distributed training for SLURM"""
@@ -217,11 +232,9 @@ def run_training(args, rank, world_size):
         do_eval=True,
         eval_steps=50,
         lr_scheduler_type="constant",
-        # Additional parameters from notebook
         max_grad_norm=0.3,
         group_by_length=True,
         logging_strategy="steps",
-        # FSDP parameters
         ddp_find_unused_parameters=False,
         fsdp="full_shard auto_wrap",
         fsdp_config={
@@ -239,6 +252,7 @@ def run_training(args, rank, world_size):
         eval_dataset=eval_dataset,
         processing_class=tokenizer,
         args=training_args,
+        callbacks=[GPUMemoryCallback(rank, args.logging_steps)],
     )
     
     if rank == 0:
