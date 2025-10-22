@@ -26,6 +26,7 @@ import json
 import platform
 import psutil
 from datetime import datetime
+from torch.distributed.fsdp import BackwardPrefetch
 
 def setup_distributed():
     """Initialize distributed training for SLURM"""
@@ -92,7 +93,7 @@ def create_fsdp_model(model_name, lora_config, rank):
     )
     
     # Don't apply PEFT here - SFTTrainer will handle it
-    # model = get_peft_model(model, lora_config)
+    model = get_peft_model(model, lora_config)
     
     model = model.to(dtype=torch.float16)
     
@@ -116,7 +117,7 @@ def create_fsdp_model(model_name, lora_config, rank):
         model,
         auto_wrap_policy=llama_auto_wrap_policy,
         mixed_precision=fp16_policy,
-        backward_prefetch="BACKWARD_PRE",
+        backward_prefetch=BackwardPrefetch.BACKWARD_PRE,
         forward_prefetch=True,
         sharding_strategy=ShardingStrategy.FULL_SHARD,
         device_id=torch.cuda.current_device(),
@@ -265,7 +266,6 @@ def run_training(args, rank, world_size):
         model=model,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
-        peft_config=lora_config,
         processing_class=tokenizer,
         args=training_args,
     )
