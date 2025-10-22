@@ -56,7 +56,8 @@ def setup_distributed():
     dist.init_process_group(
         backend="nccl",
         rank=rank,
-        world_size=world_size
+        world_size=world_size,
+        device_id=local_rank
     )
     torch.cuda.set_device(local_rank)
     
@@ -90,7 +91,8 @@ def create_fsdp_model(model_name, lora_config, rank):
         trust_remote_code=True
     )
     
-    model = get_peft_model(model, lora_config)
+    # Don't apply PEFT here - SFTTrainer will handle it
+    # model = get_peft_model(model, lora_config)
     
     model = model.to(dtype=torch.float16)
     
