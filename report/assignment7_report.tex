@@ -58,7 +58,7 @@
 
 \email{nauman843@hotmail.com}
 
-\englishabstract{We fine-tune meta-llama/Llama-2-7b-hf using Parameter-Efficient Fine-Tuning (LoRA) on the databricks/databricks-dolly-15k dataset to adapt the base model for instruction following. We report training/validation loss curves and evaluate with AlpacaEval~2 (GPT-4 as judge over the AlpacaEval dataset) and MT-Bench (FastChat). Due to budget constraints, MT-Bench judgments are computed on a subset; full model answers for all 80 conversations are generated and stored for reproducibility. We document a known limitation: the single-turn Dolly format mismatches MT-Bench's multi-turn conversational format, and the model may append "### Response:" artifacts. We provide cleaned, GitHub-renderable notebooks and scripts to reproduce fine-tuning, inference, and evaluation.}
+\englishabstract{We fine-tune meta-llama/Llama-2-7b-hf using Parameter-Efficient Fine-Tuning (LoRA) on the databricks/databricks-dolly-15k dataset to adapt the base model for instruction following. We report training/validation loss curves and evaluate with AlpacaEval~2 (GPT-4 as judge over the AlpacaEval dataset) and MT-Bench (FastChat).}
 
 \begin{document}
 \maketitle
@@ -69,9 +69,7 @@
 \section{Background and Motivation}
 \vspace*{-3mm}
 
-Large language models (LLMs) such as LLaMA-2-7B are powerful but require alignment to follow user instructions reliably. Instruction fine-tuning adapts a pretrained model from generic next-token prediction to helpful, safe, and coherent task completion. Parameter-Efficient Fine-Tuning (PEFT) with LoRA enables this alignment on modest hardware by updating a small set of low-rank adapter weights while keeping base weights frozen.
-
-We target Dolly-15K (instruction, context, response) to train an assistant-style model and evaluate with two community benchmarks expected by the assignment: AlpacaEval~2 (instruction following, GPT-4 judged) and MT-Bench (multi-turn dialogue quality, GPT-4 judged). The goal is to demonstrate loss convergence, measurable gains over the base model, and to document practical limitations and reproducibility. 
+Large language models (LLMs) such as LLaMA-2-7B are powerful but require alignment to follow user instructions reliably. Instruction fine-tuning adapts a pretrained model from generic next-token prediction to helpful, safe, and coherent task completion. Parameter-Efficient Fine-Tuning (PEFT) with LoRA enables this alignment on modest hardware by updating a small set of low-rank adapter weights while keeping base weights frozen. 
 
 \section{Relevance and related works}
 \vspace*{-3mm}
@@ -95,14 +93,14 @@ LoRA/PEFT has become a standard approach for efficient adaptation of LLMs, enabl
 \end{verbatim}
 We remove empty responses and split into train/validation/test (80/10/10).
 
-\textbf{Model \\& Training.} Base: meta-llama/Llama-2-7b-hf. We apply LoRA with PEFT, enabling 4-bit quantization if needed for memory. Key settings include learning rate, epochs, global batch size, max length, gradient checkpointing, and saving LoRA adapters. Training/validation loss is tracked per epoch. Hardware details are recorded (GPU, VRAM, runtime).
+\textbf{Model \& Training.} Base: meta-llama/Llama-2-7b-hf. We apply LoRA with PEFT, enabling 4-bit quantization if needed for memory. Key settings include learning rate, epochs, global batch size, max length, gradient checkpointing, and saving LoRA adapters. Training/validation loss is tracked per epoch. Hardware details are recorded (GPU, VRAM, runtime).
 
 \textbf{Inference.} For testing/inference, LoRA adapters are merged into the base model to create a standalone checkpoint for evaluation and answer generation.
 
 \textbf{Evaluation.} 
 \begin{itemize}
   \item \emph{AlpacaEval~2}: It is a dataset of instruction-following prompts. We generate model responses and compute win rate using GPT-4 as an automated judge against reference responses.
-  \item \emph{MT-Bench (FastChat)}: We generate model answers for 80 multi-turn conversations for both baseline and fine-tuned models. GPT-4 single-answer grading is run locally on our JSONL outputs (subset if budget-limited), producing overall and per-category scores. We document that the training prompt style may induce formatting artifacts (e.g., appending ``### Response:"), which negatively impacts MT-Bench.
+  \item \emph{MT-Bench (FastChat)}: We generate model answers for 80 multi-turn conversations for both baseline and fine-tuned models. GPT-4 single-answer grading is run locally on our JSONL outputs (subset if budget-limited), producing overall and per-category scores. We document that the training prompt style may induce formatting artifacts (e.g., appending \texttt{\#\#\# Response:}), which negatively impacts MT-Bench.
 \end{itemize}
 
 \textbf{Reproducibility.} All notebooks include explanatory markdown; Colab-specific metadata (e.g., \texttt{metadata.widgets}) is stripped to ensure GitHub rendering while preserving cell outputs. A FastChat submodule is added to run MT-Bench locally; answer files reside under the expected \texttt{model\_answer/} directory and judgments are saved under \texttt{model\_judgment/}.
@@ -188,6 +186,58 @@ This work successfully demonstrates the effectiveness of Parameter-Efficient Fin
 \textbf{Technical Efficiency.} The LoRA approach proved highly efficient, training only 0.59% of the model's parameters (39.9M out of 6.7B) while achieving substantial performance gains. This demonstrates that parameter-efficient methods can effectively adapt large language models for specific tasks without the computational overhead of full fine-tuning.
 
 \textbf{Reproducibility.} All code, notebooks, and evaluation results are made available for reproducibility. The project demonstrates a complete pipeline from data preprocessing through training to evaluation, providing a template for similar instruction-following adaptations.
+
+\section*{Appendix: Distributed Training Approaches}
+
+\subsection*{A.1 Fully Sharded Data Parallel (FSDP)}
+
+FSDP was implemented to enable training of the full LLaMA-2-7B model without quantization by sharding model parameters across multiple GPUs. The training utilized 2 NVIDIA TITAN V GPUs (11.8 GB VRAM each) on the NUS SoC SLURM cluster.
+
+\textbf{Technical Configuration:}
+\begin{itemize}
+    \item Hardware: 2× NVIDIA TITAN V GPUs, 125.5 GB system RAM
+    \item Training time: 3 hours 41 minutes (13,214.67 seconds)
+    \item Memory usage: ~6.62 GB allocated per GPU
+    \item Final training loss: 1.31 (averaged across 750 steps)
+\end{itemize}
+
+\textbf{Key Advantages:}
+\begin{itemize}
+    \item Enables training without model quantization
+    \item Memory-efficient through parameter sharding
+    \item Maintains full model precision during training
+\end{itemize}
+
+\subsection*{A.2 Distributed Data Parallel (DDP)}
+
+DDP was implemented with 4-bit quantization to address memory constraints. The approach required quantization due to Out-of-Memory (OOM) errors when attempting to load the full model on each GPU.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{training_loss_comparison.png}
+    \caption{Training Loss Comparison: FSDP vs DDP}
+    \label{fig:training_loss_comparison}
+\end{figure}
+
+\textbf{Technical Configuration:}
+\begin{itemize}
+    \item Hardware: 2× NVIDIA TITAN V GPUs (same cluster)
+    \item Training time: 46 minutes 21 seconds (2,781.60 seconds)
+    \item Memory usage: ~4.71 GB allocated per GPU
+    \item Final training loss: 1.38 (averaged across 750 steps)
+\end{itemize}
+
+\textbf{Key Observations:}
+\begin{itemize}
+    \item Significantly faster training (4.7× speedup over FSDP)
+    \item Required 4-bit quantization to prevent OOM errors
+    \item Similar final loss values despite different approaches
+\end{itemize}
+
+\textbf{Memory Constraint Analysis:}
+The OOM error in DDP without quantization demonstrates the memory limitations: "CUDA out of memory. Tried to allocate 32.00 MiB. GPU has a total capacity of 11.77 GiB of which 9.56 MiB is free." This constraint necessitated the use of 4-bit quantization for DDP, while FSDP's parameter sharding strategy avoided this limitation entirely.
+
+Both approaches successfully completed training with comparable final loss values, demonstrating the effectiveness of different distributed training strategies for large language model fine-tuning. Figure~\ref{fig:training_loss_comparison} shows the training loss progression for both methods, illustrating the convergence behavior and final performance.
 
 \section{Data Policy}
 \vspace*{-3mm}

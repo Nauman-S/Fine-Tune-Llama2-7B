@@ -12,6 +12,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from transformers import (
     AutoModelForCausalLM, 
     AutoTokenizer, 
+    BitsAndBytesConfig,
 )
 from peft import LoraConfig, get_peft_model, TaskType
 from datasets import load_dataset
@@ -44,17 +45,14 @@ def setup_distributed():
         world_size = int(os.environ['SLURM_NTASKS'])
         local_rank = int(os.environ['SLURM_LOCALID'])
         
-        # Set PyTorch distributed environment variables
         os.environ['RANK'] = str(rank)
         os.environ['WORLD_SIZE'] = str(world_size)
         os.environ['LOCAL_RANK'] = str(local_rank)
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '12355'
         
-        # Set CUDA device
         torch.cuda.set_device(local_rank)
         
-        # Initialize process group
         dist.init_process_group(backend="nccl", rank=rank, world_size=world_size)
         
         print(f"Running on SLURM cluster with rank: {rank}, world_size: {world_size}, local_rank: {local_rank}")
@@ -135,23 +133,28 @@ def format_instruction(example):
         text = f"### Instruction:\n{example['instruction']}\n\n### Response:\n{example['response']}"
     return {"text": text}
 
-def create_ddp_model(args, rank, local_rank):
-    """Create and wrap model with DDP"""
+def create_model(args, rank, local_rank):
+    """Create model for SFTTrainer (no manual DDP wrapping)"""
     print(f"[Rank {rank}] Loading model and tokenizer...")
     
-    # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     
-    # Load model
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model_name,
-        torch_dtype=torch.float16,
-        device_map=None,  # DDP will handle device placement
+    # 4-bit quantization config (same as notebook)
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_use_double_quant=True,
     )
     
-    # Create LoRA config
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model_name,
+        quantization_config=bnb_config,
+        device_map=None,
+    )
+
     lora_config = LoraConfig(
         task_type=TaskType.CAUSAL_LM,
         r=args.lora_r,
@@ -160,17 +163,10 @@ def create_ddp_model(args, rank, local_rank):
         target_modules=["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
     )
     
-    # Apply LoRA
     model = get_peft_model(model, lora_config)
     
-    # Move model to GPU
-    model = model.to(f"cuda:{local_rank}")
-    
-    # Wrap with DDP
-    model = DDP(model, device_ids=[local_rank], output_device=local_rank)
-    
-    print(f"[Rank {rank}] Model created and wrapped with DDP")
-    return model, tokenizer
+    print(f"[Rank {rank}] Model created with 4-bit quantization (SFTTrainer will handle DDP)")
+    return model, tokenizer, lora_config
 
 def main():
     parser = argparse.ArgumentParser(description="DDP LoRA Fine-tuning")
@@ -195,30 +191,23 @@ def main():
     args = parser.parse_args()
     
     try:
-        # Setup distributed training
         rank, world_size, local_rank = setup_distributed()
         
-        # Print system info only on rank 0
         get_system_info(rank)
         get_gpu_info(rank, local_rank)
         
-        # Hugging Face authentication
         if 'HF_TOKEN' in os.environ:
             login(token=os.environ['HF_TOKEN'], new_session=False)
         else:
             print("Warning: HF_TOKEN not found in environment")
         
-        # Create model and tokenizer
-        model, tokenizer = create_ddp_model(args, rank, local_rank)
-        
-        # Load and prepare dataset
+        model, tokenizer, lora_config = create_model(args, rank, local_rank)
+
         print(f"[Rank {rank}] Loading dataset...")
         dataset = load_dataset(args.dataset_name)
         
-        # Format dataset
         formatted_dataset = dataset.map(format_instruction, remove_columns=dataset["train"].column_names)
-        
-        # Split dataset (80/10/10)
+  
         train_size = int(0.8 * len(formatted_dataset["train"]))
         val_size = int(0.1 * len(formatted_dataset["train"]))
         
@@ -228,7 +217,6 @@ def main():
         print(f"[Rank {rank}] Dataset size: {len(train_dataset)} train, {len(eval_dataset)} eval")
         print(f"[Rank {rank}] Sample: {train_dataset[0]['text'][:200]}...")
         
-        # Training configuration
         training_args = SFTConfig(
             output_dir=args.output_dir,
             per_device_train_batch_size=args.per_device_train_batch_size,
@@ -252,23 +240,23 @@ def main():
             group_by_length=True,
             logging_strategy="steps",
             ddp_find_unused_parameters=False,
+            ddp_backend="nccl",
+            ddp_timeout=1800,
         )
-        
-        # Create trainer
+ 
         trainer = SFTTrainer(
             model=model,
             train_dataset=train_dataset,
             eval_dataset=eval_dataset,
             processing_class=tokenizer,
+            peft_config=lora_config,
             args=training_args,
             callbacks=[GPUMemoryCallback(rank)],
         )
         
-        # Start training
         print(f"[Rank {rank}] Starting training...")
         trainer.train()
         
-        # Save final model
         if rank == 0:
             print("Saving final model...")
             trainer.save_model()

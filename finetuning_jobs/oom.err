@@ -1,0 +1,158 @@
+[W1023 19:40:41.401583551 Utils.hpp:166] Warning: Environment variable NCCL_BLOCKING_WAIT is deprecated; use TORCH_NCCL_BLOCKING_WAIT instead (function operator())
+[W1023 19:40:41.401625662 Utils.hpp:137] Warning: Environment variable NCCL_ASYNC_ERROR_HANDLING is deprecated; use TORCH_NCCL_ASYNC_ERROR_HANDLING instead (function operator())
+[W1023 19:40:41.411930406 Utils.hpp:166] Warning: Environment variable NCCL_BLOCKING_WAIT is deprecated; use TORCH_NCCL_BLOCKING_WAIT instead (function operator())
+[W1023 19:40:41.411976921 Utils.hpp:137] Warning: Environment variable NCCL_ASYNC_ERROR_HANDLING is deprecated; use TORCH_NCCL_ASYNC_ERROR_HANDLING instead (function operator())
+Note: Environment variable`HF_TOKEN` is set and is the current active token independently from the token you've just configured.
+Note: Environment variable`HF_TOKEN` is set and is the current active token independently from the token you've just configured.
+`torch_dtype` is deprecated! Use `dtype` instead!
+`torch_dtype` is deprecated! Use `dtype` instead!
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.05it/s]
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.39it/s]
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.08it/s]
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.20it/s]
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.55it/s]
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.25it/s]
+/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/peft/tuners/tuners_utils.py:196: UserWarning: Already found a `peft_config` attribute in the model. This will lead to having multiple adapters in the model. Make sure to know what you are doing!
+  warnings.warn(
+/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/peft/tuners/tuners_utils.py:196: UserWarning: Already found a `peft_config` attribute in the model. This will lead to having multiple adapters in the model. Make sure to know what you are doing!
+  warnings.warn(
+/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:4807: UserWarning: No device id is provided via `init_process_group` or `barrier `. Using the current device set by the user. 
+  warnings.warn(  # warn only once
+[rank1]:[W1023 19:42:14.873728895 ProcessGroupNCCL.cpp:5023] [PG ID 0 PG GUID 0 Rank 1]  using GPU 1 as device used by this process is currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. You can specify device_id in init_process_group() to force use of a particular device.
+
+Adding EOS to train dataset:   0%|          | 0/12008 [00:00<?, ? examples/s]
+Adding EOS to train dataset:  24%|██▍       | 2941/12008 [00:00<00:00, 29147.00 examples/s]
+Adding EOS to train dataset:  53%|█████▎    | 6410/12008 [00:00<00:00, 32393.68 examples/s]
+Adding EOS to train dataset:  81%|████████  | 9755/12008 [00:00<00:00, 32871.33 examples/s]
+Adding EOS to train dataset: 100%|██████████| 12008/12008 [00:00<00:00, 30068.02 examples/s]
+
+Tokenizing train dataset:   0%|          | 0/12008 [00:00<?, ? examples/s]
+Tokenizing train dataset:   2%|▏         | 243/12008 [00:00<00:04, 2382.92 examples/s]
+Tokenizing train dataset:   4%|▍         | 514/12008 [00:00<00:04, 2564.30 examples/s]
+Tokenizing train dataset:   7%|▋         | 799/12008 [00:00<00:04, 2686.26 examples/s]
+Tokenizing train dataset:   9%|▉         | 1128/12008 [00:00<00:04, 2380.86 examples/s]
+Tokenizing train dataset:  12%|█▏        | 1423/12008 [00:00<00:04, 2556.82 examples/s]
+Tokenizing train dataset:  14%|█▍        | 1729/12008 [00:00<00:03, 2711.00 examples/s]
+Tokenizing train dataset:  18%|█▊        | 2137/12008 [00:00<00:03, 2540.79 examples/s]
+Tokenizing train dataset:  20%|██        | 2429/12008 [00:00<00:03, 2636.54 examples/s]
+Tokenizing train dataset:  23%|██▎       | 2755/12008 [00:01<00:03, 2805.56 examples/s]
+Tokenizing train dataset:  26%|██▌       | 3133/12008 [00:01<00:03, 2679.52 examples/s]
+Tokenizing train dataset:  29%|██▊       | 3447/12008 [00:01<00:03, 2796.49 examples/s]
+Tokenizing train dataset:  32%|███▏      | 3888/12008 [00:01<00:02, 2841.18 examples/s]
+Tokenizing train dataset:  36%|███▌      | 4279/12008 [00:01<00:02, 2692.18 examples/s]
+Tokenizing train dataset:  38%|███▊      | 4594/12008 [00:01<00:02, 2799.12 examples/s]
+Tokenizing train dataset:  42%|████▏     | 5000/12008 [00:01<00:02, 2655.02 examples/s]
+Tokenizing train dataset:  44%|████▍     | 5302/12008 [00:01<00:02, 2737.75 examples/s]
+Tokenizing train dataset:  47%|████▋     | 5590/12008 [00:02<00:02, 2772.68 examples/s]
+Tokenizing train dataset:  49%|████▉     | 5899/12008 [00:02<00:02, 2849.48 examples/s]
+Tokenizing train dataset:  52%|█████▏    | 6280/12008 [00:02<00:02, 2694.57 examples/s]
+Tokenizing train dataset:  55%|█████▍    | 6557/12008 [00:02<00:02, 2712.01 examples/s]
+Tokenizing train dataset:  57%|█████▋    | 6864/12008 [00:02<00:01, 2804.94 examples/s]
+Tokenizing train dataset:  60%|█████▉    | 7152/12008 [00:02<00:01, 2687.87 examples/s]
+Tokenizing train dataset:  62%|██████▏   | 7458/12008 [00:02<00:01, 2787.12 examples/s]
+Tokenizing train dataset:  65%|██████▍   | 7752/12008 [00:02<00:01, 2828.69 examples/s]
+Tokenizing train dataset:  68%|██████▊   | 8150/12008 [00:03<00:01, 2711.81 examples/s]
+Tokenizing train dataset:  70%|███████   | 8451/12008 [00:03<00:01, 2762.61 examples/s]
+Tokenizing train dataset:  73%|███████▎  | 8738/12008 [00:03<00:01, 2786.36 examples/s]
+Tokenizing train dataset:  76%|███████▌  | 9134/12008 [00:03<00:01, 2654.01 examples/s]
+Tokenizing train dataset:  79%|███████▊  | 9429/12008 [00:03<00:00, 2722.53 examples/s]
+Tokenizing train dataset:  81%|████████  | 9710/12008 [00:03<00:00, 2741.43 examples/s]
+Tokenizing train dataset:  83%|████████▎ | 10000/12008 [00:03<00:00, 2638.12 examples/s]
+Tokenizing train dataset:  86%|████████▌ | 10280/12008 [00:03<00:00, 2680.90 examples/s]
+Tokenizing train dataset:  88%|████████▊ | 10575/12008 [00:03<00:00, 2753.91 examples/s]
+Tokenizing train dataset:  90%|█████████ | 10853/12008 [00:03<00:00, 2757.47 examples/s]
+Tokenizing train dataset:  93%|█████████▎| 11192/12008 [00:04<00:00, 2566.34 examples/s]
+Tokenizing train dataset:  96%|█████████▌| 11471/12008 [00:04<00:00, 2622.27 examples/s]
+Tokenizing train dataset:  98%|█████████▊| 11761/12008 [00:04<00:00, 2695.76 examples/s]
+Tokenizing train dataset: 100%|██████████| 12008/12008 [00:04<00:00, 2672.87 examples/s]
+
+Truncating train dataset:   0%|          | 0/12008 [00:00<?, ? examples/s]
+Truncating train dataset: 100%|██████████| 12008/12008 [00:00<00:00, 165940.84 examples/s]
+/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:4807: UserWarning: No device id is provided via `init_process_group` or `barrier `. Using the current device set by the user. 
+  warnings.warn(  # warn only once
+[rank0]:[W1023 19:42:19.961999521 ProcessGroupNCCL.cpp:5023] [PG ID 0 PG GUID 0 Rank 0]  using GPU 0 as device used by this process is currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. You can specify device_id in init_process_group() to force use of a particular device.
+
+Adding EOS to eval dataset:   0%|          | 0/1501 [00:00<?, ? examples/s]
+Adding EOS to eval dataset: 100%|██████████| 1501/1501 [00:00<00:00, 23801.09 examples/s]
+
+Tokenizing eval dataset:   0%|          | 0/1501 [00:00<?, ? examples/s]
+Tokenizing eval dataset:  18%|█▊        | 273/1501 [00:00<00:00, 2703.05 examples/s]
+Tokenizing eval dataset:  38%|███▊      | 566/1501 [00:00<00:00, 2822.73 examples/s]
+Tokenizing eval dataset:  67%|██████▋   | 1000/1501 [00:00<00:00, 2617.81 examples/s]
+Tokenizing eval dataset:  87%|████████▋ | 1308/1501 [00:00<00:00, 2765.86 examples/s]
+Tokenizing eval dataset: 100%|██████████| 1501/1501 [00:00<00:00, 2674.68 examples/s]
+
+Truncating eval dataset:   0%|          | 0/1501 [00:00<?, ? examples/s]
+Truncating eval dataset: 100%|██████████| 1501/1501 [00:00<00:00, 70866.64 examples/s]
+[rank1]: Traceback (most recent call last):
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/train_ddp_lora.py", line 281, in <module>
+[rank1]:     main()
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/train_ddp_lora.py", line 254, in main
+[rank1]:     trainer = SFTTrainer(
+[rank1]:               ^^^^^^^^^^^
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/trl/trainer/sft_trainer.py", line 844, in __init__
+[rank1]:     super().__init__(
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/transformers/utils/deprecation.py", line 172, in wrapped_func
+[rank1]:     return func(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/transformers/trainer.py", line 612, in __init__
+[rank1]:     self._move_model_to_device(model, args.device)
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/transformers/trainer.py", line 910, in _move_model_to_device
+[rank1]:     model = model.to(device)
+[rank1]:             ^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1369, in to
+[rank1]:     return self._apply(convert)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 928, in _apply
+[rank1]:     module._apply(fn)
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 928, in _apply
+[rank1]:     module._apply(fn)
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 928, in _apply
+[rank1]:     module._apply(fn)
+[rank1]:   [Previous line repeated 5 more times]
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 955, in _apply
+[rank1]:     param_applied = fn(param)
+[rank1]:                     ^^^^^^^^^
+[rank1]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1355, in convert
+[rank1]:     return t.to(
+[rank1]:            ^^^^^
+[rank1]: torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 32.00 MiB. GPU 1 has a total capacity of 11.77 GiB of which 9.56 MiB is free. Including non-PyTorch memory, this process has 11.75 GiB memory in use. Of the allocated memory 11.31 GiB is allocated by PyTorch, and 7.34 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/train_ddp_lora.py", line 281, in <module>
+[rank0]:     main()
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/train_ddp_lora.py", line 254, in main
+[rank0]:     trainer = SFTTrainer(
+[rank0]:               ^^^^^^^^^^^
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/trl/trainer/sft_trainer.py", line 844, in __init__
+[rank0]:     super().__init__(
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/transformers/utils/deprecation.py", line 172, in wrapped_func
+[rank0]:     return func(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/transformers/trainer.py", line 612, in __init__
+[rank0]:     self._move_model_to_device(model, args.device)
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/transformers/trainer.py", line 910, in _move_model_to_device
+[rank0]:     model = model.to(device)
+[rank0]:             ^^^^^^^^^^^^^^^^
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1369, in to
+[rank0]:     return self._apply(convert)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 928, in _apply
+[rank0]:     module._apply(fn)
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 928, in _apply
+[rank0]:     module._apply(fn)
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 928, in _apply
+[rank0]:     module._apply(fn)
+[rank0]:   [Previous line repeated 5 more times]
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 955, in _apply
+[rank0]:     param_applied = fn(param)
+[rank0]:                     ^^^^^^^^^
+[rank0]:   File "/home/e/e0389102/assignment7/finetuning_jobs/ddp/ddp-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1355, in convert
+[rank0]:     return t.to(
+[rank0]:            ^^^^^
+[rank0]: torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 32.00 MiB. GPU 0 has a total capacity of 11.77 GiB of which 9.56 MiB is free. Including non-PyTorch memory, this process has 11.75 GiB memory in use. Of the allocated memory 11.31 GiB is allocated by PyTorch, and 7.34 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+srun: error: xgpd3: task 0: Exited with exit code 1
+srun: error: xgpd3: task 1: Exited with exit code 1

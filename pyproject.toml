@@ -8,5 +8,6 @@ dependencies = [
     "datasets>=4.2.0",
     "ipykernel>=7.0.1",
     "jupyter>=1.1.1",
+    "matplotlib>=3.10.7",
     "polars>=1.34.0",
 ]
