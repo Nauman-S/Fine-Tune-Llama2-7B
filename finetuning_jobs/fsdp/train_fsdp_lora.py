@@ -31,12 +31,11 @@ from transformers import TrainerCallback
 class GPUMemoryCallback(TrainerCallback):
     """Callback to log GPU memory usage during training"""
     
-    def __init__(self, rank, logging_steps=10):
+    def __init__(self, rank):
         self.rank = rank
-        self.logging_steps = logging_steps
     
     def on_step_end(self, args, state, control, **kwargs):
-        if state.global_step % self.logging_steps == 0:
+        if state.global_step % 10 == 0:
             allocated = torch.cuda.memory_allocated(self.rank) / 1024**3
             reserved = torch.cuda.memory_reserved(self.rank) / 1024**3
             
@@ -252,7 +251,7 @@ def run_training(args, rank, world_size):
         eval_dataset=eval_dataset,
         processing_class=tokenizer,
         args=training_args,
-        callbacks=[GPUMemoryCallback(rank, args.logging_steps)],
+        callbacks=[GPUMemoryCallback(rank)],
     )
     
     if rank == 0:
@@ -311,7 +310,7 @@ def main():
         parser.add_argument("--num_train_epochs", type=int, default=1)
         parser.add_argument("--per_device_train_batch_size", type=int, default=2)
         parser.add_argument("--gradient_accumulation_steps", type=int, default=4)
-        parser.add_argument("--learning_rate", type=float, default=2e-4)
+        parser.add_argument("--learning_rate", type=float, default=1e-4)
         parser.add_argument("--max_length", type=int, default=1024)
         parser.add_argument("--lora_r", type=int, default=16)
         parser.add_argument("--lora_alpha", type=int, default=32)
