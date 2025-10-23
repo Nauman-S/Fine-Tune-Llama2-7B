@@ -74,7 +74,7 @@ Large language models (LLMs) such as LLaMA-2-7B are powerful but require alignme
 \section{Relevance and related works}
 \vspace*{-3mm}
 
-LoRA/PEFT has become a standard approach for efficient adaptation of LLMs, enabling fine-tuning on consumer-grade GPUs. Dolly-15K provides a permissive instruction-following corpus. AlpacaEval~2 and MT-Bench (via FastChat) are widely used evaluation protocols; both rely on LLM-as-a-judge (e.g., GPT-4) for scalable scoring. This work follows those best practices, while explicitly noting dataset--evaluation format mismatches (single-turn vs. multi-turn) as an important confounder for MT-Bench.
+LoRA/PEFT has become a standard approach for efficient adaptation of LLMs, enabling fine-tuning on consumer-grade GPUs. Dolly-15K provides a permissive instruction-following corpus. AlpacaEval~2 and MT-Bench (via FastChat) are widely used evaluation protocols; both rely on LLM-as-a-judge (e.g., GPT-4) for scalable scoring.
 
 
 \section{Methods and Approach}
@@ -99,11 +99,11 @@ We remove empty responses and split into train/validation/test (80/10/10).
 
 \textbf{Evaluation.} 
 \begin{itemize}
-  \item \emph{AlpacaEval~2}: It is a dataset of instruction-following prompts. We generate model responses and compute win rate using GPT-4 as an automated judge against reference responses.
+  \item \emph{AlpacaEval~2}: It is a dataset of instruction-following prompts. We generate model responses and compute win rate using GPT-4 as an automated judge against reference responses~[1].
   \item \emph{MT-Bench (FastChat)}: We generate model answers for 80 multi-turn conversations for both baseline and fine-tuned models. GPT-4 single-answer grading is run locally on our JSONL outputs (subset if budget-limited), producing overall and per-category scores. We document that the training prompt style may induce formatting artifacts (e.g., appending \texttt{\#\#\# Response:}), which negatively impacts MT-Bench.
 \end{itemize}
 
-\textbf{Reproducibility.} All notebooks include explanatory markdown; Colab-specific metadata (e.g., \texttt{metadata.widgets}) is stripped to ensure GitHub rendering while preserving cell outputs. A FastChat submodule is added to run MT-Bench locally; answer files reside under the expected \texttt{model\_answer/} directory and judgments are saved under \texttt{model\_judgment/}.
+\textbf{Reproducibility.} All notebooks include explanatory markdown; Colab-specific metadata (e.g., \texttt{metadata.widgets}) is stripped to ensure GitHub rendering while preserving cell outputs. A FastChat submodule is added to run MT-Bench locally; answer files reside under the expected \texttt{model\_answer/} directory and judgments are saved under \texttt{model\_judgment/}~[2].
 
 
 \section{Results and Evaluation}
@@ -191,7 +191,7 @@ This work successfully demonstrates the effectiveness of Parameter-Efficient Fin
 
 \subsection*{A.1 Fully Sharded Data Parallel (FSDP)}
 
-FSDP was implemented to enable training of the full LLaMA-2-7B model without quantization by sharding model parameters across multiple GPUs. The training utilized 2 NVIDIA TITAN V GPUs (11.8 GB VRAM each) on the NUS SoC SLURM cluster.
+FSDP was implemented to enable training of the full LLaMA-2-7B model without quantization by sharding model parameters across multiple GPUs. The training utilized 2 NVIDIA TITAN V GPUs (11.8 GB VRAM each) on the NUS SoC SLURM cluster~[3].
 
 \textbf{Technical Configuration:}
 \begin{itemize}
@@ -210,7 +210,7 @@ FSDP was implemented to enable training of the full LLaMA-2-7B model without qua
 
 \subsection*{A.2 Distributed Data Parallel (DDP)}
 
-DDP was implemented with 4-bit quantization to address memory constraints. The approach required quantization due to Out-of-Memory (OOM) errors when attempting to load the full model on each GPU.
+DDP was implemented with 4-bit quantization to address memory constraints. The approach required quantization due to Out-of-Memory (OOM) errors when attempting to load the full model on each GPU~[4].
 
 \begin{figure}[h!]
     \centering
@@ -235,14 +235,14 @@ DDP was implemented with 4-bit quantization to address memory constraints. The a
 \end{itemize}
 
 \textbf{Memory Constraint Analysis:}
-The OOM error in DDP without quantization demonstrates the memory limitations: "CUDA out of memory. Tried to allocate 32.00 MiB. GPU has a total capacity of 11.77 GiB of which 9.56 MiB is free." This constraint necessitated the use of 4-bit quantization for DDP, while FSDP's parameter sharding strategy avoided this limitation entirely.
+The OOM error in DDP without quantization demonstrates the memory limitations: "CUDA out of memory. Tried to allocate 32.00 MiB. GPU has a total capacity of 11.77 GiB of which 9.56 MiB is free." This constraint necessitated the use of 4-bit quantization for DDP, while FSDP's parameter sharding strategy avoided this limitation entirely~[5].
 
-Both approaches successfully completed training with comparable final loss values, demonstrating the effectiveness of different distributed training strategies for large language model fine-tuning. Figure~\ref{fig:training_loss_comparison} shows the training loss progression for both methods, illustrating the convergence behavior and final performance.
+Both approaches successfully completed training with comparable final loss values, demonstrating the effectiveness of different distributed training strategies for large language model fine-tuning. Figure 1 shows the training loss progression for both methods, illustrating the convergence behavior and final performance.
 
-\section{Data Policy}
+\section{Future Work}
 \vspace*{-3mm}
 
-We open-source the code, notebooks, and configuration to reproduce training, inference, and evaluation. Notebooks are cleaned to render on GitHub while preserving outputs. MT-Bench model answers and (partial) GPT-4 judgments are saved in the repository structure expected by FastChat for local inspection. Dataset usage follows respective licenses.
+Future improvements could include experimenting with larger models (LLaMA-2-13B or 70B), exploring more sophisticated quantization techniques, and implementing gradient checkpointing to further reduce memory requirements during distributed training.
 
 
 
@@ -252,6 +252,15 @@ We open-source the code, notebooks, and configuration to reproduce training, inf
  %  \caption{A typical figure.}
  %    \label{fig:my-fig}
  %    \end{figure}
+
+\section*{References}
+\begin{enumerate}
+\item \label{eval_notebooks} Evaluation Notebooks. \url{https://github.com/Nauman-S/Fine-Tune-Llama2-7B/tree/main/eval}
+\item \label{github_repo} Fine-Tune-Llama2-7B Repository. \url{https://github.com/Nauman-S/Fine-Tune-Llama2-7B}
+\item \label{fsdp_implementation} FSDP Implementation. \url{https://github.com/Nauman-S/Fine-Tune-Llama2-7B/tree/main/finetuning\_jobs/fsdp}
+\item \label{ddp_implementation} DDP Implementation. \url{https://github.com/Nauman-S/Fine-Tune-Llama2-7B/tree/main/finetuning\_jobs/ddp}
+\item \label{oom_error_log} OOM Error Log. \url{https://github.com/Nauman-S/Fine-Tune-Llama2-7B/blob/main/finetuning\_jobs/oom.err}
+\end{enumerate}
 
 \bibliographystyle{ieee_fullname}
 \bibliography{references}
